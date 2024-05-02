@@ -3,7 +3,7 @@ const app = express();
 const mysql = require('mysql');
 const port = 3002;
 
-//connection to mysql
+//connection to mysql database name tasks
 const connection= mysql.createConnection({
     host : 'localhost',
     user : 'root',
