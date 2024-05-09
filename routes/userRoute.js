@@ -39,8 +39,9 @@ router.post('/register', async (req, res) => {
                   {
                     const tkn = jwt.sign(
                       {
-                        Email: results[0].Email,
+              
                         Username: results[0].Username,
+                        Email: results[0].Email,
                         User_Role: results[0].User_Role
                       }, process.env.ACCESS_TOKEN_SECRET, 
                       {

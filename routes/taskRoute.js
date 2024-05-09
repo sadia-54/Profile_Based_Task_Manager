@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const connectDB = require('../database');
-const{tokenVerification, isAdmin} = require('../tokenAdminHandler');
+const{verifyToken, isAdmin} = require('../tokenAdminHandler');
 
 router.get('/getTask', verifyToken, async(req, res)=>{
     try{
