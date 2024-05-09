@@ -1,10 +1,11 @@
 const express = require('express');
 const app = express();
-const mysql = require('mysql');
-const port = 3002;
+const mysql = require('mysql');    //import mysql
+const jwt = require('jsonwebtoken');   //import jsonwebtoken
+const bcrypt = require('bcrypt');     //import bcrypt
+const dotenv = require('dotenv');     //import dotenv
+const port = 3002;   
 
-//install jwt
-import jwt from 'jsonwebtoken'
 
 //connection to mysql database named task_manager_crud_app
 const connection= mysql.createConnection({
@@ -18,11 +19,12 @@ connection.connect(function(err){
     if(err) throw err;
     console.log('Connected');
 
-    // con.query('CREATE DATABASE ')
 });
 
 //using middleware for parsing json requests
 app.use(express.json());
+
+dotenv.config();
 
 //Create a new user profile
 app.post('/user', (req, res) => {
@@ -161,4 +163,3 @@ app.delete('/task/:Task_ID', (req, res) => {
 app.listen(port, () => {
     console.log('Server is running on port 3002');
 });
-
