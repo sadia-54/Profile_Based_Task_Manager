@@ -1,26 +1,31 @@
-const jwt = require('jsonwebtoken');
 
-const verifyToken = (req, res, next)=>{
-    const{authorization} = req.headers;
-    try{
+const jwt = require('jsonwebtoken');
+//  const connection = require('../config/db');
+
+
+const verifyToken = (req, res, next) => {
+    const { authorization } = req.headers;
+    try {
         const token = authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        const{Username, Email, User_Role} = decoded;
+        const { Username, Email, User_Role } = decoded;
+        
         req.Username = Username;
         req.Email = Email;
         req.User_Role = User_Role;
         next();
-    } catch{
-        next('Authentication Failed!');
+    } catch {
+        next('Authentication Failure');
     }
 }
 
-const isAdmin = (req, res, next)=>{
-    if(req.user.User_Role!=='Admin'){
-        return res.status(404).json({error: 'Authorization Failed!'});
+// authMiddleware.js
+const isAdmin = (req, res, next) => {
+    if (req.user.User_Role !== 'Admin') {
+        return res.status(403).json({ error: 'authorization failed !' });
     }
     next();
 };
 
 
-module.exports = {verifyToken, isAdmin};
+module.exports = { verifyToken, isAdmin };

@@ -1,124 +1,124 @@
+
+
 const express = require('express');
 const router = express.Router();
 const connectDB = require('../database');
-const{verifyToken, isAdmin} = require('../tokenAdminHandler');
+const { verifyToken, isAdmin } = require('../tokenAdminHandler');
 
-router.get('/getTask', verifyToken, async(req, res)=>{
-    try{
+router.get('/getTask', verifyToken, async (req, res) => {
+    try {
         const userId = req.Email;
-        const sql = 'SELECT * FROM task WHERE User_ID = ?';
-        connectDB.query(sql, userId, (err, result)=>{
-            if(err) res.status(404).json("Failed!");
+        const query = 'SELECT * FROM task WHERE User_ID = ?';
+        connectDB.query(query, userId, (error, result) => {
+            if (error) res.status(500).json("Failed");
             res.status(200).json({
-                message: "Got Tasks Successfully.",
+                message: "Successfully get task",
                 task: result
-            });
-        });
-    } catch(err){
-        console.error('Error getting tasks:', err);
-        res.status(404).json({ error: 'Error getting tasks!'});
+            })
+        })
+    } catch (error) {
+        console.error('Error fetching tasks:', error);
+        res.status(500).json({ error: 'Error fetching tasks' });
     }
 });
 
 
-router.get('/getAllTask', verifyToken, async(req, res)=>{
-    try{
+router.get('/getAllTask', verifyToken, async (req, res) => {
+    try {
         const userRole = req.User_Role;
-        if(req.User_Role === "Admin")
-            {
-                const userId = req.Email;
-                const sql = 'SELECT * FROM task';
-                connectDB.query(sql, (err, result)=>{
-                    if(err) res.status(404).json("Failed!");
-                    res.status(200).json({
-                        message: "Got Task Successfully",
-                        task: result
-                    });
-                });
-            } else res.status(404).json("Only Admins Can Get Access!");
-        
-            } catch(err){
-                console.error('Error fetching tasks!', err);
-                res.status(404).json({ error: 'Error fetching tasks!'});
-            }
-    });
+        if (req.User_Role === "Admin") {
+            const userId = req.Email;
+            const query = 'SELECT * FROM task';
+            connectDB.query(query, (error, result) => {
+                if (error) res.status(500).json("Failed");
+                res.status(200).json({
+                    message: "Successfully get task",
+                    task: result
+                })
+            })
+        } else res.status(404).json("You are not an admin");
 
-
-router.post('/addTask', verifyToken, async(req, res)=>{
-    try{
-        const userId = req.Email;
-        const{ Title, Description, Status} = req.body;
-        const sql = 'INSERT INTO task (Title, Description, Status, User_ID) VALUES (?, ?, ?, ?)';
-        await connectDB.query(sql, [Title, Description, Status, User_ID]);
-
-        res.status(200).json({ message: 'New Task Has Created Successfully!'});
-
-    }catch(err){
-        res.status(404).json({error: 'Error Creating a New Task!'});
+    } catch (error) {
+        console.error('Error fetching tasks:', error);
+        res.status(500).json({ error: 'Error fetching tasks' });
     }
 });
 
 
-router.put('/updateTask/:Task_ID', verifyToken, async(req, res)=>{
-    try{
+router.post('/addTask', verifyToken, async (req, res) => {
+    try {
         const userId = req.Email;
+        const { Title, Description, Status } = req.body;
+        const query = 'INSERT INTO task (Title, Description, Status, User_ID) VALUES (?, ?, ?, ?)';
+        await connectDB.query(query, [Title, Description, Status, userId]);
+
+        res.status(201).json({ message: 'Task created successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error creating task' });
+    }
+});
+
+
+router.put('/updateTask/:Task_ID', verifyToken, async (req, res) => {
+    try {
+        const userId = req.Email; // Retrieve user ID from the authenticated user
         const taskId = req.params.Task_ID;
-        const sql = 'UPDATE task SET Title = ?, Description = ?, Status = ? WHERE Task_ID = ? AND User_ID = ?';
-        
-        const values = 
-        [
+
+        const query = 'UPDATE task SET Title = ?, Description = ?, Status = ? WHERE Task_ID = ? AND User_ID = ?';
+        const values = [
             req.body.Title,
             req.body.Description,
             req.body.Status,
             taskId,
             userId
         ]
-        connectDB.query(sql, values, (err, result)=>{
-            if(err) res.status(404).json("Failed!");
-            res.status(200).json({message: "Task Successfully Updated!"});
-        });
-    } catch(err){
-        console.error('Error Updating Task!', err);
-        res.status(404).json({error: 'Error Updating Task!'});
+
+        connectDB.query(query, values, (error, result) => {
+            if (error) res.status(500).json("Failed");
+            res.status(200).json({
+                message: "Successfully Updated"
+            })
+        })
+
+    } catch (error) {
+        console.error('Error updating task:', error);
+        res.status(500).json({ error: 'Error updating task' });
     }
 });
 
-
-router.delete('/task/:Task_ID', verifyToken, isAdmin, async(req, res)=>{
-    try{
+router.delete('/tasks/:Task_ID', verifyToken, isAdmin, async (req, res) => {
+    try {
         const taskId = req.params.Task_ID;
-        const sql = 'DELETE FROM task WHERE Task_ID = ?';
-        await connectDB.query(sql, [taskId]);
-
-        res.status(200).json({message: 'Task Deleted Successfully'});
-    } catch(err){
-        console.error('Error deleting Task!', err);
-        res.status(404).json({error: 'Error Deleting Task!'});
+        const query = 'DELETE FROM task WHERE Task_ID = ?';
+        await connectDB.query(query, [taskId]);
+        res.json({ message: 'Task deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        res.status(500).json({ error: 'Error deleting task' });
     }
 });
 
 
-router.delete('/deleteTask/:Task_ID', verifyToken, async(req, res)=>{
-    try{
+router.delete('/deleteTask/:Task_ID', verifyToken, async (req, res) => {
+    try {
         const userId = req.Email;
         const taskId = req.params.Task_ID;
-        const sql = 'DELETE FROM task WHERE Task_ID = ? AND User_ID = ?';
-        const values = 
-        [
+        const query = 'DELETE FROM task WHERE Task_ID = ? AND User_ID = ?';
+        const values = [
             taskId,
             userId
         ]
 
-        connectDB.query(sql, values, (err, result)=>{
-            if(err) res.status(404).json("Failed!");
+        connectDB.query(query, values, (error, result) => {
+            if (error) res.status(500).json("Failed");
             res.status(200).json({
-                message: "Successfully Deleted!",
+                message: "Successfully deleted",
                 result: result
-            });
-        });
-    } catch(err){
-        console.error('Error Deleting Task!');
-        res.status(404).json({error: 'Error Deleting Task!'});
+            })
+        })
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        res.status(500).json({ error: 'Error deleting task' });
     }
 });
 

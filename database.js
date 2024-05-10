@@ -1,16 +1,19 @@
 const mysql = require('mysql');
 
-const connection= mysql.createConnection({
-    host : 'localhost',
-    user : 'root',
-    password : '',
-    database : 'task_manager_crud_app'
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'task_manager_crud_app'
 });
 
-connection.connect(function(err){
-    if(err) throw err;
-    console.log('Connected');
-
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to database:', err);
+    return;
+  }
+  console.log('Connected to database');
 });
 
-module.exports = connection;
+
+module.exports = db;
