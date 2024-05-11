@@ -4,7 +4,7 @@ const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'task_manager_crud_app'
+  database: 'task_manager_crud_app' //connect to database
 });
 
 db.connect((err) => {

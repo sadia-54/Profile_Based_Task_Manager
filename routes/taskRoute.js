@@ -5,6 +5,21 @@ const router = express.Router();
 const connectDB = require('../database');
 const { verifyToken, isAdmin } = require('../tokenAdminHandler');
 
+// add new tasks
+router.post('/addTask', verifyToken, async (req, res) => {
+    try {
+        const userId = req.Email;
+        const { Title, Description, Status } = req.body;
+        const query = 'INSERT INTO task (Title, Description, Status, User_ID) VALUES (?, ?, ?, ?)';
+        await connectDB.query(query, [Title, Description, Status, userId]);
+
+        res.status(201).json({ message: 'Task created successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error creating task' });
+    }
+});
+
+//get task as a regular user
 router.get('/getTask', verifyToken, async (req, res) => {
     try {
         const userId = req.Email;
@@ -22,7 +37,7 @@ router.get('/getTask', verifyToken, async (req, res) => {
     }
 });
 
-
+// get task as an admin
 router.get('/getAllTask', verifyToken, async (req, res) => {
     try {
         const userRole = req.User_Role;
@@ -44,21 +59,7 @@ router.get('/getAllTask', verifyToken, async (req, res) => {
     }
 });
 
-
-router.post('/addTask', verifyToken, async (req, res) => {
-    try {
-        const userId = req.Email;
-        const { Title, Description, Status } = req.body;
-        const query = 'INSERT INTO task (Title, Description, Status, User_ID) VALUES (?, ?, ?, ?)';
-        await connectDB.query(query, [Title, Description, Status, userId]);
-
-        res.status(201).json({ message: 'Task created successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error creating task' });
-    }
-});
-
-
+//update task by task id
 router.put('/updateTask/:Task_ID', verifyToken, async (req, res) => {
     try {
         const userId = req.Email; // Retrieve user ID from the authenticated user
@@ -86,6 +87,7 @@ router.put('/updateTask/:Task_ID', verifyToken, async (req, res) => {
     }
 });
 
+//delete task by task id 
 router.delete('/tasks/:Task_ID', verifyToken, isAdmin, async (req, res) => {
     try {
         const taskId = req.params.Task_ID;
@@ -122,4 +124,5 @@ router.delete('/deleteTask/:Task_ID', verifyToken, async (req, res) => {
     }
 });
 
+//export the module
 module.exports = router;

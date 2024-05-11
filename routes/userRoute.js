@@ -1,11 +1,11 @@
-
-
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const connectDB = require('../database');
 
+
+// create a new account
 router.post('/register', async (req, res) => {
     try {
         const { Username, Email, Password, User_Role } = req.body;
@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-
+//login to account
 router.post('/login', async (req, res) => {
     try {
         const sql = "SELECT * FROM user WHERE Username = ?";
@@ -55,4 +55,5 @@ router.post('/login', async (req, res) => {
     }
 })
 
+//export the module
 module.exports = router;
